@@ -1,38 +1,30 @@
+## jaxrs-example
 
-[(Japanese version here)](http://unhurried.hatenablog.com/entry/heroku_jaxrs)
+This is a simple Java JSON/REST web-services project example with database integration, suitable for Heroku.  Its pretty basic, but exposes a self-documenting (if silly) database-backed RESTful API with a minimum of code. 
 
-# heroku-jaxrs
+It uses:
 
-REST API sample Java application to deploy to Heroku.
+* [Maven](http://maven.apache.org/) for configuration
+* [Jetty](http://www.eclipse.org/jetty/) as a container
+* [Jackson 2.0](http://jackson.codehaus.org/) for JSON encoding/decoding
+* [JDBI](http://jdbi.org) and [BoneCP](http://jolbox.com) for Postgres access
+* [Postgres](http://www.postgresql.org) as the underlying database
+* [Swagger](https://developers.helloreverb.com/swagger/) for API documentation
 
-## Points
+The APIs are all served from the /api/ endpoint.  To make things interesting I've included the Swagger GUI client at ```/swagger/``` - note that this is absolutely not needed for deployment, and you can use any REST client to access the API endpoints.  The endpoints are documented at ```/api/api-docs/``` which is where this copy of Swagger will look by default when its accessed.
 
-* Jersey, which is a reference implementation of JAX-RS (Java EE) is used to implement REST APIs.
-
-* Run the application with Web Runner described in Heroku documents.   
-https://devcenter.heroku.com/articles/java-webapp-runner
-
-* Jersey recommends to use MOXy as a JAXB (serialization and deserialization of JSON) library. However this project uses Jackson because MOXy doesn't support the deserialization to inner classes or HashMap.   
-https://jersey.java.net/documentation/latest/media.html#json.moxy   
-http://stackoverflow.com/questions/29322605/how-to-return-a-json-object-from-a-hashmap-with-moxy-and-jersey
-
-* The configulation of Resource classes or ObjectMapper are done in ResourceConfig class.   
-（/src/main/java/com/example/ResourceConfig.java)
-
-* ResouceConfig class can be passed to Jersey by writing init-param（javax.ws.rs.Application）in a web.xml.
-
-## Run the application locally
-
-* Install JDK
-* Install Apache Maven
-* Build the application
-
-```text
-maven clean package
+Finally it assumes that you have a DATABASE_URL environment variable set similar to:
+```
+export DATABASE_URL=postgres://dbuser:dbpass@localhost/databasename
 ```
 
-* Start Web Runner
-
-```text
-java -jar target/dependency/webapp-runner.jar target/*.war
+To run it on a self-contained [Heroku](https://get.heroku.com) environment, simply install git and the heroku toolbelt locally and issue the following commands:
 ```
+git clone https://github.com/rjstanford/jaxrs-example.git;
+heroku create;
+heroku addons:add heroku-postgresql;
+heroku ps:scale web=1;
+git push heroku master;
+```
+
+Access it through the URL that Heroku gives you and you should be good to go.
